@@ -74,16 +74,17 @@ class CustomTextFormFieldState extends State<CustomTextFormField> {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8),
+      padding: const EdgeInsets.symmetric(vertical: 6),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
-          Text(
-            widget.labelText,
-            style: const TextStyle(fontWeight: FontWeight.w500),
-          ),
-          const SizedBox(height: 2),
+          if (widget.labelText.isNotEmpty)
+            Text(
+              widget.labelText,
+              style: const TextStyle(fontWeight: FontWeight.w500),
+            ),
+          if (widget.labelText.isNotEmpty) const SizedBox(height: 2),
           TextFormField(
             initialValue: widget.initialValue,
             controller: widget._controller,

@@ -3,10 +3,10 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 class AuthApi {
   final SupabaseClient supabase = Supabase.instance.client;
-  Future<User?> login(String phone, String password) async {
+  Future<User?> login(String email, String password) async {
     try {
       final AuthResponse response = await supabase.auth.signInWithPassword(
-        email: phone,
+        email: email,
         password: password,
       );
       if (response.user != null) {
@@ -20,22 +20,37 @@ class AuthApi {
     return null;
   }
 
-  Future<User?> register(String phone, String password) async {
-    try {
-      final AuthResponse res = await supabase.auth.signUp(
-        phone: phone,
-        password: password,
-        channel: OtpChannel.sms,
-      );
+  Future<User?> register(String email, String password) async {
+    const maxRetries = 5;
+    int retries = 0;
+    int delay = 1000; // Start with a delay of 1 second
 
-      if (res.user == null) {
-        debugPrint('❌ Error - AuthApi: register ${res.hashCode}');
-      } else {
-        return res.user;
+    while (retries < maxRetries) {
+      try {
+        final response =
+            await supabase.auth.signUp(email: email, password: password);
+        if (response.user != null) {
+          // Successfully signed up
+          print('Sign up successful');
+          return response.user;
+        } else {
+          // Handle other errors
+        }
+      } catch (e) {
+        if (e is AuthException && e.message == 'Email rate limit exceeded') {
+          // Handle rate limit exceeded
+          retries++;
+          print('Rate limit exceeded, retrying in $delay ms...');
+          // await Future.delayed(Duration(milliseconds: delay));
+          delay *= 2; // Exponential backoff
+        } else {
+          // Handle other exceptions
+          print('Error: ${e.toString()}');
+        }
       }
-    } catch (e) {
-      debugPrint('❌ Error - AuthApi: register $e');
     }
+
+    print('Max retries reached, please try again later.');
     return null;
   }
 }
