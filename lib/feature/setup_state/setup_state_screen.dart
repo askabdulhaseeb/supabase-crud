@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 class SetupStateScreen extends StatefulWidget {
   const SetupStateScreen({super.key});
+  static const String routeName = '/setup-state';
 
   @override
   State<SetupStateScreen> createState() => _SetupStateScreenState();
